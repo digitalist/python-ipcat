@@ -16,9 +16,11 @@ IPCAT_FILENAME = os.path.join(IPCAT_HOME, "datacenters.csv")
 IPCAT_SQLITE = os.path.join(IPCAT_HOME, "datacenters.sqlite")
 IPCAT_URL = "https://raw.github.com/client9/ipcat/master/datacenters.csv"
 
+
 def _addr_to_int(value):
     _ = value.split('.')
     return (int(_[0]) << 24) + (int(_[1]) << 16) + (int(_[2]) << 8) + int(_[3])
+
 
 def _retrieve_url(url, filename=None):
     try:
@@ -26,6 +28,7 @@ def _retrieve_url(url, filename=None):
     except:
         filename = None
     return filename
+
 
 def _update():
     global SQLITE_CURSOR
@@ -40,7 +43,8 @@ def _update():
 
             os.makedirs(IPCAT_HOME)
 
-        if not os.path.exists(IPCAT_FILENAME) or (time.time() - os.stat(IPCAT_FILENAME).st_mtime) / 3600 / 24 >= DOWNLOAD_FRESH_IPCAT_DELTA_DAYS:
+        if not os.path.exists(IPCAT_FILENAME) or (
+                time.time() - os.stat(IPCAT_FILENAME).st_mtime) / 3600 / 24 >= DOWNLOAD_FRESH_IPCAT_DELTA_DAYS:
             print("[i] retrieving '%s'" % IPCAT_URL, file=sys.stderr)
 
             filename = _retrieve_url(IPCAT_URL, IPCAT_FILENAME)
@@ -67,7 +71,8 @@ def _update():
                     for row in f.readlines():
                         if not row.startswith('#') and not row.startswith('start'):
                             row = row.strip().split(",")
-                            cur.execute("INSERT INTO ranges VALUES (?, ?, ?)", (_addr_to_int(row[0]), _addr_to_int(row[1]), row[2]))
+                            cur.execute("INSERT INTO ranges VALUES (?, ?, ?)",
+                                        (_addr_to_int(row[0]), _addr_to_int(row[1]), row[2]))
 
                 cur.close()
                 con.commit()
@@ -76,6 +81,7 @@ def _update():
 
     except Exception as e:
         print("[x] something went wrong during database update ('%s')" % str(e), file=sys.stderr)
+
 
 def lookup(address):
     global SQLITE_CURSOR
@@ -96,6 +102,7 @@ def lookup(address):
         print("[x] invalid IP address '%s'" % address, file=sys.stderr)
 
     return retval
+
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
